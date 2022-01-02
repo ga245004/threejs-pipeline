@@ -2,6 +2,7 @@ import "./styles.css";
 import * as THREE from "three";
 import { Editor } from "./Editor/Editor";
 import { Viewport } from "./Editor/Viewport";
+import { Sidebar } from "./Sidebar/Sidebar";
 let isLoadingFromHash = false;
 const editor = new Editor();
 window.editor = editor;
@@ -9,6 +10,9 @@ window.THREE = THREE;
 
 const viewport = new Viewport(editor);
 document.body.appendChild(viewport.dom);
+
+const sidebar = new Sidebar(editor);
+document.body.appendChild(sidebar.dom);
 
 editor.storage.init().then(() => {
   editor.storage.get().then((state) => {

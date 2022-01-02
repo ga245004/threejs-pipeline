@@ -1,6 +1,12 @@
+import { Scene, PerspectiveCamera, Vector3 } from "three";
 import { Signal } from "./../libs/signals.min";
 import { Storage as _Storage } from "./../Utils/Storage";
 import { Config } from "./../Utils/Config";
+
+const _DEFAULT_CAMERA = new PerspectiveCamera(50, 1, 0.01, 1000);
+_DEFAULT_CAMERA.name = "Camera";
+_DEFAULT_CAMERA.position.set(0, 5, 10);
+_DEFAULT_CAMERA.lookAt(new Vector3());
 
 class Editor {
   constructor() {
@@ -71,6 +77,20 @@ class Editor {
 
     this.config = new Config();
     this.storage = new _Storage();
+
+    this.camera = _DEFAULT_CAMERA.clone();
+
+    this.scene = new Scene();
+    this.scene.name = "Scene";
+
+    this.objects = {};
+    this.geometries = {};
+    this.material = {};
+    this.textures = {};
+    this.scripts = {};
+
+    this.cameras = {};
+    this.viewportCamera = this.camera;
   }
 
   selectByUuid(uuid) {}
