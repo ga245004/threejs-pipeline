@@ -3,6 +3,12 @@ import * as THREE from "three";
 import { Editor } from "./Editor/Editor";
 import { Viewport } from "./Editor/Viewport";
 import { Sidebar } from "./Sidebar/Sidebar";
+import { Menubar } from "./Menubar/Menubar";
+
+Number.prototype.format = function () {
+  return this.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,");
+};
+
 let isLoadingFromHash = false;
 const editor = new Editor();
 window.editor = editor;
@@ -13,6 +19,9 @@ document.body.appendChild(viewport.dom);
 
 const sidebar = new Sidebar(editor);
 document.body.appendChild(sidebar.dom);
+
+const menubar = new Menubar(editor);
+document.body.appendChild(menubar.container.dom);
 
 editor.storage.init().then(() => {
   editor.storage.get().then((state) => {
@@ -35,7 +44,7 @@ editor.storage.init().then(() => {
     timeout = setTimeout(() => {
       editor.signals.savingStarted.dispatch();
       timeout = setTimeout(() => {
-        editor.storage.set(editor.toJson());
+        editor.storage.set(editor.toJSON());
         editor.signals.savingFinised.dispatch();
       }, 100);
     }, 1000);

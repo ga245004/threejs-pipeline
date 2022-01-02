@@ -2,6 +2,8 @@ import { Scene, PerspectiveCamera, Vector3 } from "three";
 import { Signal } from "./../libs/signals.min";
 import { Storage as _Storage } from "./../Utils/Storage";
 import { Config } from "./../Utils/Config";
+import { Strings } from "../Utils/Strings";
+import { History as _History } from "../Utils/History";
 
 const _DEFAULT_CAMERA = new PerspectiveCamera(50, 1, 0.01, 1000);
 _DEFAULT_CAMERA.name = "Camera";
@@ -76,7 +78,9 @@ class Editor {
     };
 
     this.config = new Config();
+    this.history = new _History(this);
     this.storage = new _Storage();
+    this.strings = new Strings(this.config);
 
     this.camera = _DEFAULT_CAMERA.clone();
 
@@ -91,12 +95,62 @@ class Editor {
 
     this.cameras = {};
     this.viewportCamera = this.camera;
+    this.addCamera(this.camera);
   }
-
+  setViewportCamera(uuid) {
+    this.viewportCamera = this.cameras[uuid];
+    this.signals.viewportCameraChanged.dispatch();
+  }
+  addCamera(camera) {
+    if (camera.isCamera) {
+      this.cameras[camera.uuid] = camera;
+      this.signals.cameraAdded.dispatch(camera);
+    }
+  }
+  addHelper(helper) {}
   selectByUuid(uuid) {}
+
+  addObject(object, parent, index) {
+    object.traverse((child) => {
+      if (child.geometry) {
+        this.addGeometry(child.geometry);
+      }
+      if (child.material) {
+        this.addMaterial(child.material);
+      }
+      this.addCamera(child);
+      this.addHelper(child);
+    });
+    if (parent) {
+      parent.children.splice(index, 0, object);
+      object.parent = parent;
+    } else {
+      this.scene.add(object);
+    }
+    this.signals.objectAdded.dispatch(object);
+    this.signals.sceneGraphChanged.dispatch();
+  }
+  removeObject(object) {}
+  addGeometry(geometry) {}
+  addMaterial(material) {}
+
+  select() {}
+  deselect() {}
   clear() {}
+  objectByUuid(uuid) {
+    return this.scene.getObjectByProperty("uuid", uuid, true);
+  }
+  execute(cmd, optionalName) {
+    this.history.execute(cmd, optionalName);
+  }
+  undo() {
+    this.history.undo();
+  }
+  redo() {
+    this.history.redo();
+  }
   fromJSON() {}
-  toJson() {
+  toJSON() {
     return {};
   }
 }
