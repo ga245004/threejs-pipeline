@@ -1,0 +1,16 @@
+body {
+  font-family: sans-serif;
+  margin: 0px;
+  background-color: #ffffff;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+#scene-container {
+  height: 100vh;
+}
+
+canvas:focus {
+  outline: none;
+}
